@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>x86-64 HTTP Server</title>
+
+<style>
+:root {
+    --bg: #111;
+    --fg: #ddd;
+    --accent: #8be9fd;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: monospace;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+}
+
+pre {
+    margin: 0;
+    padding: 2rem;
+    border: 1px solid #333;
+    background: #181818;
+    line-height: 1.5;
+    white-space: pre-wrap;
+}
+
+span {
+    color: var(--accent);
+}
+</style>
+</head>
+
+<body>
+<pre><span>$</span> curl http://localhost/
+
+this is an http server
+
+made in
+  no libc
+  x86-64 assembly
+
+serving this page
+with raw syscalls.</pre>
+</body>
+</html>
