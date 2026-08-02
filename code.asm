@@ -134,7 +134,7 @@ process_request:
         mov rax, 0 ; read()
         mov rdi, r13 ; the location of the client_fd
         lea rsi, [rel request_buf] ; allocated memory in .bss to read the request
-        mov rdx, 4096 
+        mov rdx, 8192 
         syscall ; end of read()
         mov rcx, rax ; total size
         
