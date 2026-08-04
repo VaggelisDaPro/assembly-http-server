@@ -8,22 +8,26 @@ A simple static HTTP server written in pure x86-64 assembly, using Linux syscall
 - No libc
 - Linux syscalls only
 - Safe file access with `openat2()`
-- ~10 KB executable
+- Automated MIME type checking
+- `sendfile()` usage for serving any size file
+- ~12 KB executable
 - Compiles with NASM and ld
 
 # Project Overview
 
-This project is a simple HTTP server that serves static files. It was made libc-less so its only ~10KB in size and eliminates any dependency issues that could've occured.
+This project is a simple HTTP server that serves static files. It was made libc-less so it's only ~12KB in size and eliminates any dependency issues that could've occurred.
 
 Since it has no libc and only runs on syscalls, you are able to compile it with `nasm` and run it instantly. Look below for more instructions on how to install.
 
 The server is hosted on `:8080`. Requests on `/` are mapped to `index.html`, so you can use the provided [index.html](./index.html) to test for yourself. All other paths are relative to the server's working directory and are served if the requested file exists. Since it uses `openat2()` to load files, path traversal attacks are more difficult than a naive `open()` implementation. Security testing is welcome, although it hasn't undergone any formal auditing.
 
+> [!NOTE]
+> As of 1.1, the server allows to send any size files with the new `sendfile()` implementation, and has automated MIME type checking for a few common objects, such as stylesheets, JavaScript code, PDFs and more.
+
 Obviously, this is not a production grade server, and there are some stuff you should be mindful of:
 
 - Only a few responses are hardcoded in this project, which suffice for what this project is trying to achieve.
-- Files larger than 8KiB will not be served reliably, and some may be cut off early. I didn't implement a loop that will send the file in packets, so anything larger than the `file_content_buf` will be cut off.
-- The `Content-Type` is hardcoded to `text/html`, so it may cause a few issues such as stylesheets not loading, javascript not functioning and images not displaying (if loaded from an external file).
+- Currently the server is single threaded, meaning it will work on a single client before going to the next one. _I am planning on adding multithreading on the next version of this project._
 
 As of writing, these are some core issues that come to mind, and surely there are a few more, but the project itself is pretty well functioning for its purpose.
 
@@ -33,8 +37,6 @@ Some values you can tweak for your testing:
 
 1. Port Number
    The port number is stored in network byte order, so any changes will need to be made accordingly. You can change the port number found in line 29.
-2. File size
-   Currently any file larger than the buffer (8KiB) will fail to render fully, and will be cut off early. You can change that to your liking on line 41.
 
 # AI Usage
 
@@ -47,13 +49,13 @@ In order for the compiled server to run, you require Linux 5.6 (2020) or newer a
 Also you will require `nasm` in order to compile the binary, which can be installed with:
 
 ```bash
-$ sudo apt install nasm
+sudo apt install nasm
 ```
 
 The linker used is `ld` which comes from `binutils` and should be preinstalled on your environment. Should it not be installed, you can install it with:
 
 ```bash
-$ sudo apt install binutils
+sudo apt install binutils
 ```
 
 ## Building & Running
@@ -61,20 +63,21 @@ $ sudo apt install binutils
 1. Clone the repo.
 
 ```bash
-$ git clone https://github.com/VaggelisDaPro/assembly-http-server
+git clone https://github.com/VaggelisDaPro/assembly-http-server
 ```
 
 2. Navigate to the directory and run the [build.sh](./build.sh) file.
 
 ```bash
-$ cd ./assembly-http-server/
-$ ./build.sh
+cd ./assembly-http-server/
+chmod +x ./build.sh
+./build.sh
 ```
 
 3. Run the server file that was compiled.
 
 ```bash
-$ ./server
+./server
 ```
 
 Feel free to use the supplied [index.html](./index.html) file so something is displayed at the root.
